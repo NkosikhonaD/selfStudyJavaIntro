@@ -3,14 +3,21 @@ package com.security.FraudData;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Date;
 
 public class FraudDataAnalyser {
 	
 	private static final String ChronoUnits = null;
-
-	public void generateData()
+	/*public static String getField( )
+	{
+		int rand = randBetween(0,currentField.length-1);
+		return currentField[rand];
+	}*/
+	public static String getIDs()
+	{
+		return ""+randBetween(10000,50000)+","+randBetween(60000,80000);
+	}
+	public static void generateData()
 	{
 		/*indictor,reason,DateOfLoss,DateOfClaim,BrokerID,InsuredID,InsuredName,InsuredSurname,Gender,KindOfLoss
 		* PolicyHolderStreet,PolicyHolderProvince,PolicyHolderCity,PolicyHolderArea,PolicyHolderPostalCode,ProvinceLoss,CityLoss,AreaLoss,PostalCode,MaritalStatus,DateBirth
@@ -52,27 +59,27 @@ public class FraudDataAnalyser {
 		day = randBetween(1,10);
 		month=randBetween(1,5);
 		yearBirth =randBetween(18,50);
-		yearPolicyStart =yearBirth+18+randBetween(0,9);
+		yearPolicyStart =yearBirth+randBetween(0,9);
 		yearPolicyEnd =yearPolicyStart+randBetween(1,9);
 		yearClaim = yearPolicyStart +randBetween(1,9);
 		sumInsured =randBetween(20000,100000);
 		//amountPaid =sumInsured -randBetween(1,19000);
 		LocalDate today = LocalDate.now();
-		for(int i = 0; i<6;i++)
+		for(int i = 0; i<1000;i++)
 		{
 			
 			try
 			{	
 				dateBirth =today.minus(yearBirth,ChronoUnit.YEARS);
-				dateBirth =today.minus(day,ChronoUnit.DAYS);
+				dateBirth =dateBirth.minus(day,ChronoUnit.DAYS);
 				dateBirth =dateBirth.minus(month,ChronoUnit.MONTHS);
-				dateStart =dateBirth.plus(yearBirth,ChronoUnit.YEARS);
+				dateStart = dateBirth.plus(yearBirth,ChronoUnit.YEARS);
 				dateStart = dateBirth.plus(day,ChronoUnit.DAYS);
 				dateStart = dateBirth.plus(month,ChronoUnit.MONTHS);
 				dateClaim = getValidClaimDate(dateStart,dateEnd);
 				dateLoss = getValidDateLoss(dateStart,dateClaim);
 				amountPaid =getValidAmountPaid(sumInsured);
-			
+				
 			}
 			catch(DateTimeException dte)
 			{
@@ -83,7 +90,7 @@ public class FraudDataAnalyser {
 				System.out.println(exp.getMessage());
 			}
 				//dateBirth.of(yearClaim,month,day);
-			record=claimIndicator+" all details verified valid" + dateLoss.toString()  ; 
+			record=claimIndicator+" all details verified valid " + dateLoss.toString() +" "+ dateClaim.toString(); 
 			// change street number
 			if(i%10 ==0)
 			{
@@ -97,7 +104,14 @@ public class FraudDataAnalyser {
 					
 				
 			}
-				
+			System.out.println(record);
+			day = randBetween(1,10);
+			month=randBetween(1,5);
+			yearBirth =randBetween(18,50);
+			yearPolicyStart =yearBirth+randBetween(0,9);
+			yearPolicyEnd =yearPolicyStart+randBetween(1,9);
+			yearClaim = yearPolicyStart +randBetween(1,9);
+			sumInsured =randBetween(20000,100000);
 		}
 		
 	}
@@ -209,7 +223,10 @@ public class FraudDataAnalyser {
 	public static void main(String[] args) 
 	{
 		// TODO Auto-generated method stub
-
+		
+		generateData();
+		System.out.println("Method called");
+		
 	}
 
 }
