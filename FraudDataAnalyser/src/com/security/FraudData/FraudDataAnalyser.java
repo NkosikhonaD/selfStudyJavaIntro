@@ -54,6 +54,7 @@ public class FraudDataAnalyser {
 		String[] towns  = {"Springs","WitBank","Delmas","Pongola","Kempton Park","Springs","Thabazimbi","Tzaneen","Palaborwa","Middleburg","NewCastle","Thohoyando"};
 		String[] streets ={"Prospect","Hill","Hilda","Church","Standza","University","Old Johannesburg Road", "Steve Biko", "Kilimanjaro", "University Rd","Old Pretoria Rd", "Esselen","Lilian Ngoyi","Lynwood Rd","Bel Air"};
 		String[] companyNames ={"Volvo car repairs","Super Cars dealer","BMW","Rubex constructors"};
+		String[] provinces ={"Gauteng","Limpopo","Mpumalana","Western Cape","Northen Cape","Eastern Cape","KwaZulu Natal","Free State","North West"};
 		int day,month,year,yearBirth,yearPolicyStart,yearPolicyEnd,yearDamage,yearClaim =0;
 		
 		day = randBetween(1,10);
@@ -89,9 +90,9 @@ public class FraudDataAnalyser {
 			{
 				System.out.println(exp.getMessage());
 			}
-				//dateBirth.of(yearClaim,month,day);
-			record=claimIndicator+" all details verified valid " + dateLoss.toString() +" "+ dateClaim.toString(); 
-			// change street number
+			
+			record=claimIndicator+" all details verified valid "+getIDs()+" " + dateLoss.toString() +" "+ dateClaim.toString(); 
+			
 			if(i%10 ==0)
 			{
 				
@@ -114,6 +115,14 @@ public class FraudDataAnalyser {
 			sumInsured =randBetween(20000,100000);
 		}
 		
+	}
+	public static String getAll(String peopleNames[])
+	{
+		return "";
+	}
+	public static String getPostalCode()
+	{
+		return ""+randBetween(100,1000);
 	}
 	public static int getValidAmountPaid(int amountInsured)
 	{
@@ -225,7 +234,6 @@ public class FraudDataAnalyser {
 		// TODO Auto-generated method stub
 		
 		generateData();
-		System.out.println("Method called");
 		
 	}
 
