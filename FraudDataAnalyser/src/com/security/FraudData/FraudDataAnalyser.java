@@ -1,13 +1,25 @@
 package com.security.FraudData;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import weka.associations.*;
+import weka.classifiers.Classifier;
+import weka.classifiers.functions.SMO;
+import weka.core.Instances;
+import weka.classifiers.Evaluation;
+import java.util.Random;
 
-public class FraudDataAnalyser {
+import weka.core.converters.CSVLoader;
+import weka.core.converters.ConverterUtils.DataSource;
+public class FraudDataAnalyser
+{
 	
-	private static final String ChronoUnits = null;
+    ////private static final String ChronoUnits = null;
 	public static String claimIndicator ="True";
 	public static LocalDate today = LocalDate.now();
 	public static LocalDate dateLoss=LocalDate.now();
@@ -34,8 +46,8 @@ public class FraudDataAnalyser {
 	public static int indexPeople = 1;
 	public static int indexGender =1;
 	
-	public static String[] peopleNames= {"John Yarnall","Deirdre Bilski","Deirdre Bilski","Alethea Haven","Jutta Richie","Suellen Mero","Cedric Inouye ","Olevia Racette","Chantel Zirbel  ","Collene Dumais  ","Amiee Bessler","Betsy Lorraine","Dulce Canez  ","","","Amada Almada","Collen Dike","Margareta Obert","Lezlie Krach","Lurlene Slinkard ","Rigoberto Mercado","Yoshiko Avilez  ","Yoshiko Avilez","Ranee Yokley","Aja Tarpley","atum Bamber ","Tawana Metzinger","Jolene Bosworth","Caitlyn Day","Alisa Walling","Creola Waite","Anna Bankhead","Zona Deroche ","Rina Lynch  ","Shondra Sung ","Armanda Wozniak  ","Harris Mcchesney ","Heriberto Langston ","Jaqueline Schunk","Maurita Musselwhite","Gigi Zwart","Harley Farmer","Winona Hewey","Gonzalo Holtzen","Nelda Boateng","Sanford Schubert","Samuel Squier","Ezequiel Montesino","Cordie Manners","January Raborn","Shauna Genovese","Cecile Aichele","Ramiro Mungia","Eli Byerly"};
-	public static String[] places = {"Vaal de Grace","Willow Park","Menlo Park","Meyers Park","Mooikloof","Erasmusrand","Fearie Glen","Lynwood Manor","Lynwood Ridge","Gugulethu","Willow Park","Rondebosch","Reitkol","","Sundra","Hazyview","Malelane","uMlazi","Howick","Osizweni","Madadeni"};
+	public static String[] peopleNames= {"John Yarnall","Deirdre Bilski","Deirdre Bilski","Alethea Haven","Jutta Richie","Suellen Mero","Cedric Inouye ","Olevia Racette","Chantel Zirbel  ","Collene Dumais  ","Amiee Bessler","Betsy Lorraine","Dulce Canez ","Amada Almada","Collen Dike","Margareta Obert","Lezlie Krach","Lurlene Slinkard ","Rigoberto Mercado","Yoshiko Avilez  ","Yoshiko Avilez","Ranee Yokley","Aja Tarpley","atum Bamber ","Tawana Metzinger","Jolene Bosworth","Caitlyn Day","Alisa Walling","Creola Waite","Anna Bankhead","Zona Deroche ","Rina Lynch  ","Shondra Sung ","Armanda Wozniak  ","Harris Mcchesney ","Heriberto Langston ","Jaqueline Schunk","Maurita Musselwhite","Gigi Zwart","Harley Farmer","Winona Hewey","Gonzalo Holtzen","Nelda Boateng","Sanford Schubert","Samuel Squier","Ezequiel Montesino","Cordie Manners","January Raborn","Shauna Genovese","Cecile Aichele","Ramiro Mungia","Eli Byerly"};
+	public static String[] places = {"Vaal de Grace","Willow Park","Menlo Park","Meyers Park","Mooikloof","Erasmusrand","Fearie Glen","Lynwood Manor","Lynwood Ridge","Gugulethu","Willow Park","Rondebosch","Reitkol","Sundra","Hazyview","Malelane","uMlazi","Howick","Osizweni","Madadeni"};
 	public static String[] cities	={"Johanesburg","Pretoria","Kimberly","Durban","Nelspriut","Polokwane","RustenBurg","Bloemfontien"};
 	public static String[] towns  = {"Springs","WitBank","Delmas","Pongola","Kempton Park","Springs","Thabazimbi","Tzaneen","Palaborwa","Middleburg","NewCastle","Thohoyando"};
 	public static String[] streets ={"Prospect Str","Hill Str","Hilda Aveune","Church","Standza","University Rd","Old Johannesburg Road", "Steve Biko Rd", "Kilimanjaro Street", "University Rd","Old Pretoria Rd", "Esselen","Lilian Ngoyi","Lynwood Rd","Bel Air Avenue"};
@@ -59,38 +71,29 @@ public class FraudDataAnalyser {
 		int index = randBetween(0,g.length-1);
 		return g[index];
 	}
-	public static void generateData()
-	{
-		/*indictor,reason,DateOfLoss,DateOfClaim,BrokerID,InsuredID,InsuredName,InsuredSurname,Gender,KindOfLoss
-		* PolicyHolderStreet,PolicyHolderProvince,PolicyHolderCity,PolicyHolderArea,PolicyHolderPostalCode,ProvinceLoss,CityLoss,AreaLoss,PostalCode,MaritalStatus,DateBirth
-		* SumIsured,TotalPoliciesRevenue,AmountPaid,PolicyStartDate,PolicyEndDate,NameOtherParty,SurnameOtherParty
-		* ClaimServiceProvider
-		*Alphen Park Arcadia Ashlea Gardens Bailey's Muckleneuk Brooklyn Brummeria Bryntirion
-	    Clydesdale Colby Constantia Park Die Wilgers Eastcliff Eastwoow Elardus Park Equestria Erasmuskloof
-	    Erasmusrand Faerie Glen Garsfontein Groenkloof Grootfontein Hatfield Hazeldean Hazelwood Hillcrest
-	    Kilberry La Montagne Lydiana Lynnrodene Lynnwood Lynnwood Glen Lynnwood Manor
-	    Lynnwood Park Lynnwood Ridge Lukasrand Menlo Park Menlyn Meyerspark Monument Park Mooikloof Moreleta Park Muckleneuk
-	    Murrayfiel Nieuw Muckleneuk Newlands Olympus Pretorius Park Rietvalleirand Shere A.H.
-	    Silver Lakes Sterrewag Sunnyside Trevenna Val de Grace Wapadrand Waterkloof Waterkloof Glen Waterkloof Park
-	    Waterkloof Ridge Willow Glen Willow Park Manor Wingate Park Woodhill Woodlands Zwavelpoort
-	     
-		* Street names : Church, Standza, Vos, khutsong ,prospect, mzilikazi
-		* 0002 Pretoria, 
-		* 770 Cape Town, places : Mowbray, Rondebosh, Rondebosh East, Salt River, Campus Bay, 
-		*Guateng 1550 Springs Gauteng
-		*
-		*  Dirty records: missing Date of claim,
-		*  
-		*/
-		
-		//String record,reason,brokerId,InsuredId,InsuredName,Surname,Gender,KindOfLoss,insuredStreet,InsuredProvice,InsuredCity,InsuredArrea,InsuredPostCode,eventProvince,eventCity,eventArea,eventPostalCode,insuredMaritalStatus,thirdPartyName,thirdPartySurname,serviceProvider="";
 	
-		//amountPaid =sumInsured -randBetween(1,19000);
-		
-		for(int i = 0; i<1000;i++)
-		{
-			System.out.println(getAll(maritalStatus,gender,peopleNames,places,cities,towns,loss,streets,companyNames,provinces));
-		}
+	public static void generateData(String FileName)
+	{
+		String content="";
+			
+			try (BufferedWriter bw = new BufferedWriter(new FileWriter(FileName,true)))
+			{
+				System.out.println("Writting to file .....\n ");
+				for( int i =0; i<100000;i++)
+				{
+				
+					content= getAll(maritalStatus,gender,peopleNames,places,cities,towns,loss,streets,companyNames,provinces)+"\n";
+					bw.write(content);
+				}
+			
+				System.out.println("Done");
+			} 
+			catch (IOException e) 
+			{
+
+				e.printStackTrace();
+
+			}
 		
 	}
 	public static String getMaritalStatus( String[] s)
@@ -145,12 +148,12 @@ public class FraudDataAnalyser {
 			System.out.println(exp.getMessage());
 		}
 		
-		String record= claimIndicator+" all details verified valid "+" "+ dateLoss.toString() +" "+ dateClaim.toString()+" "+getIDs(); 
+		String record= " all details verified valid "+" "+ dateLoss.toString() +" "+ dateClaim.toString()+" "+getIDs(); 
 		
 		return record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
 				","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
 					+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
-					+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+					+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex]+","+claimIndicator;
 	}
 	public static String getPostalCode()
 	{
@@ -264,8 +267,47 @@ public class FraudDataAnalyser {
 	public static void main(String[] args) 
 	{
 		// TODO Auto-generated method stub
+		//DataSource dataSource= null;
+		CSVLoader loader = new CSVLoader();
 		
-		generateData();
+			
+
+		
+		//Instances thisInstance = null;
+		try
+		
+		{
+			loader.setSource(new File("/home/hltuser/insuranceRecords.csv"));
+
+			String[] option1s = new String[1]; 
+			option1s[0] = "-H";
+			loader.setOptions(option1s);
+			//dataSource= new DataSource("/home/hltuser/insuranceRecords.csv");
+			//thisInstance = dataSource.getDataSet();
+			Instances thisInstance = loader.getDataSet();
+			thisInstance.setClassIndex(thisInstance.numAttributes()-1);
+			SMO mySOM = new SMO();
+			 String[] options = new String[2];
+			 options[0] = "-R";
+			 options[1] = "1";
+			 StringBuffer sb = new StringBuffer();
+			Evaluation eval = new Evaluation(thisInstance);
+			//eval.crossValidateModel(classifier, data, numFolds, random, forPredictionsPrinting);
+			eval.crossValidateModel(mySOM,thisInstance,10,new Random(1));
+			System.out.println(eval.toSummaryString());
+			//mySOM.buildClassifier(thisInstance);
+		}
+		
+		///predictions = java.lange.StringBuffer.new
+			//	eval.crossValidateModel(j48, newData, 10, Random.new(1), predictions, Range.new('1'), true)
+		
+		catch(Exception e)
+		{
+			
+			System.out.println(e.getMessage());
+		}
+		
+		//generateData("/home/hltuser/insuranceRecords.csv");
 		
 	}
 
