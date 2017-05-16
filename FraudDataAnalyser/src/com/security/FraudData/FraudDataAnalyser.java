@@ -1,17 +1,24 @@
 package com.security.FraudData;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import weka.associations.*;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.SMO;
+import weka.classifiers.functions.supportVector.RBFKernel;
 import weka.core.Instances;
 import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
+
 import java.util.Random;
 
 import weka.core.converters.CSVLoader;
@@ -82,7 +89,7 @@ public class FraudDataAnalyser
 				for( int i =0; i<100000;i++)
 				{
 				
-					content= getAll(maritalStatus,gender,peopleNames,places,cities,towns,loss,streets,companyNames,provinces)+"\n";
+					content= getAll(maritalStatus,gender,peopleNames,places,cities,towns,loss,streets,companyNames,provinces,i,0)+"\n";
 					bw.write(content);
 				}
 			
@@ -101,7 +108,7 @@ public class FraudDataAnalyser
 		int i =  randBetween(0,s.length-1);
 		return s[i]; 
 	}
-	public static String getAll(String[] marital, String[] gender, String peopleNames[],String places[],String[] cities,String[] towns,String[] loss ,String[] streets,String[] companyNames,String[] provinces )
+	public static String getAll(String[] marital, String[] gender, String peopleNames[],String places[],String[] cities,String[] towns,String[] loss ,String[] streets,String[] companyNames,String[] provinces,int position,int count)
 	{
 		
 		sumRevenue =randBetween(1000,200000);
@@ -148,12 +155,62 @@ public class FraudDataAnalyser
 			System.out.println(exp.getMessage());
 		}
 		
-		String record= " all details verified valid "+" "+ dateLoss.toString() +" "+ dateClaim.toString()+" "+getIDs(); 
-		
-		return record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
-				","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
-					+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
-					+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex]+","+claimIndicator;
+		String record= ","+ dateLoss.toString() +","+ dateClaim.toString()+","+getIDs(); 
+		//create Fraud entries
+		if(position%1000==0)
+		{
+			count++;
+			//change sumRevenue to ==0,
+			if(count<20)
+			{
+				sumRevenue =0;
+			record = "False"+","+"No revenue recieved"+ record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+					","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+						+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+						+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+			return record;
+			}
+			else if (count>=20 &&count <40)
+			{
+				amountPaid = sumInsured+amountPaid;
+				record = "False"+","+"amount paid is greater than amount insured"+ record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+						","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+							+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+							+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+				return record;
+			}
+			else if (count >=40 && count<60)
+			{
+				
+				
+					record = "False"+","+"no loss"+ record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+"none"+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+							","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+								+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+								+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+			
+					return record;
+			}	
+				//default to 
+			else
+			{
+					record = "False"+","+"all entries are valid"+record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+							","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+								+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+								+"R"+sumInsured+","+"R"+0+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+			
+			
+					return record;
+			}	
+			
+		}
+		else
+		{
+			record = "True"+","+"all entries are valid"+record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+			","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+				+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+				+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+			return record;
+		} 
 	}
 	public static String getPostalCode()
 	{
@@ -253,6 +310,60 @@ public class FraudDataAnalyser
 		
 		return (temp.isBefore(dateEnd))? temp :dateEnd ;
 	}
+	public static void generateFraudInstances(String filename,String outputFile)
+	{
+		FileInputStream fstream ;
+		  DataInputStream in ;
+		  BufferedReader br;
+		  String line;
+		  BufferedWriter bw;
+		  String content;
+		  int trace = 0;
+		try
+		{
+			
+			fstream = new FileInputStream(filename);
+			in = new DataInputStream(fstream);
+			br = new BufferedReader(new InputStreamReader(in));
+			bw= new BufferedWriter(new FileWriter(outputFile,true));
+			System.out.println("Writting to file");
+			while((line =br.readLine())!=null)
+			{
+				
+				if(trace%1000==0)
+				{
+					content = line.replaceFirst("True","False\n");
+					//System.out.println(content);
+					
+					bw.write(content);
+					//break;
+				}
+				else
+				{
+					
+					content = line;
+					//System.out.println(content);
+					bw.write(content+"\n");
+				}
+				
+				trace++;
+			
+			}
+			System.out.println("Done writting to file");
+
+
+			in.close();
+			bw.close();
+		}
+		catch(Exception exp)
+		{
+			System.out.println(exp.getMessage());
+		}
+		
+		
+		
+	}
+	
 	
 	/*
 	 * random number generator between 2 numbers
@@ -264,42 +375,31 @@ public class FraudDataAnalyser
 		return start +(int)Math.round(Math.random()*(end-start));
 	}
 	
-	public static void main(String[] args) 
+	public static void trainCrossValidateModel()
 	{
-		// TODO Auto-generated method stub
-		//DataSource dataSource= null;
 		CSVLoader loader = new CSVLoader();
 		
-			
-
-		
-		//Instances thisInstance = null;
 		try
-		
 		{
-			loader.setSource(new File("/home/hltuser/insuranceRecords.csv"));
-
+		 loader.setSource(new File("/home/hltuser/insuranceRecords.csv"));
 			String[] option1s = new String[1]; 
+			
 			option1s[0] = "-H";
 			loader.setOptions(option1s);
-			//dataSource= new DataSource("/home/hltuser/insuranceRecords.csv");
-			//thisInstance = dataSource.getDataSet();
 			Instances thisInstance = loader.getDataSet();
-			thisInstance.setClassIndex(thisInstance.numAttributes()-1);
-			SMO mySOM = new SMO();
-			 String[] options = new String[2];
-			 options[0] = "-R";
-			 options[1] = "1";
-			 StringBuffer sb = new StringBuffer();
+			thisInstance.setClassIndex(0);
+			NaiveBayes mynb = new NaiveBayes();
+			//SMO mysmo = new SMO();
+			//mynb.buildClassifier(thisInstance);
 			Evaluation eval = new Evaluation(thisInstance);
 			//eval.crossValidateModel(classifier, data, numFolds, random, forPredictionsPrinting);
-			eval.crossValidateModel(mySOM,thisInstance,10,new Random(1));
-			System.out.println(eval.toSummaryString());
-			//mySOM.buildClassifier(thisInstance);
+	
+			eval.crossValidateModel(mynb,thisInstance,10,new Random(1));
+			
+			//eval.evaluateModel(mySOM,thisInstance);
+			System.out.println(eval.toSummaryString("Evaluation results:\n",false));
+	
 		}
-		
-		///predictions = java.lange.StringBuffer.new
-			//	eval.crossValidateModel(j48, newData, 10, Random.new(1), predictions, Range.new('1'), true)
 		
 		catch(Exception e)
 		{
@@ -307,7 +407,20 @@ public class FraudDataAnalyser
 			System.out.println(e.getMessage());
 		}
 		
+	}
+	
+	public static void main(String[] args) 
+	{
+		// TODO Auto-generated method stub
+	
+		
+		
 		//generateData("/home/hltuser/insuranceRecords.csv");
+		
+		trainCrossValidateModel();
+		
+		//generateFraudInstances("/home/hltuser/insuranceRecords.csv","/home/hltuser/insuranceRecordsFraud.csv");
+		
 		
 	}
 
