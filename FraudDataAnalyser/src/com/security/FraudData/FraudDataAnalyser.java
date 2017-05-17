@@ -15,9 +15,14 @@ import weka.associations.*;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.SMO;
 import weka.classifiers.functions.supportVector.RBFKernel;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.evaluation.EvaluationUtils;
+import weka.classifiers.evaluation.Prediction;
+import weka.classifiers.trees.J48;
+import weka.classifiers.trees.j48.*;
 
 import java.util.Random;
 
@@ -363,8 +368,6 @@ public class FraudDataAnalyser
 		
 		
 	}
-	
-	
 	/*
 	 * random number generator between 2 numbers
 	 * @ param start ,minimum int
@@ -375,7 +378,7 @@ public class FraudDataAnalyser
 		return start +(int)Math.round(Math.random()*(end-start));
 	}
 	
-	public static void trainCrossValidateModel()
+	public static void trainNaiveBayesCrossValidateModel()
 	{
 		CSVLoader loader = new CSVLoader();
 		
@@ -388,6 +391,16 @@ public class FraudDataAnalyser
 			loader.setOptions(option1s);
 			Instances thisInstance = loader.getDataSet();
 			thisInstance.setClassIndex(0);
+			
+
+		    // build associator
+		    //Apriori apriori = new Apriori();
+		    //apriori.setClassIndex(thisInstance.classIndex());
+		    //apriori.buildAssociations(thisInstance);
+
+		    // output associator
+		   // System.out.println(apriori);
+		
 			NaiveBayes mynb = new NaiveBayes();
 			//SMO mysmo = new SMO();
 			//mynb.buildClassifier(thisInstance);
@@ -409,6 +422,119 @@ public class FraudDataAnalyser
 		
 	}
 	
+	public static void trainJ48ValidateModel()
+	{
+		//CSVLoader loader1 = new CSVLoader();
+		CSVLoader loader = new CSVLoader();
+		
+		try
+		{
+		 loader.setSource(new File("/home/hltuser/insuranceRecords.csv"));
+		// loader1.setSource(new File("/home/hltuser/testAll.csv"));
+			String[] option1s = new String[1]; 
+			
+			option1s[0] = "-H";
+			loader.setOptions(option1s);
+			
+			Instances instances = loader.getDataSet();
+			instances.setClassIndex(0);
+			
+			Instances randData = new Instances(instances);
+			randData.randomize(new Random(1));
+			randData.stratify(10);
+			J48 j48 = new J48();
+			NaiveBayes nb = new NaiveBayes();
+			
+			for(int i=0;i<10;i++)
+			{
+				Evaluation eval = new Evaluation(randData);
+				
+				Instances train = randData.trainCV(10,i);
+				Instances test = randData.testCV(10,1);
+				
+				nb.buildClassifier(train);
+				
+				eval.evaluateModel(nb, test);
+				System.out.println();
+				System.out.println(eval.toMatrixString("=== Confusion matrix for fold " + (1+1) + "/" + 10 + " ===\n"));
+				System.out.println("Correct % = "+eval.pctCorrect());
+				System.out.println("Incorrect % = "+eval.pctIncorrect());
+				System.out.println("AUC = "+eval.areaUnderROC(1));
+				System.out.println("kappa = "+eval.kappa());
+				System.out.println("MAE = "+eval.meanAbsoluteError());
+				System.out.println("RMSE = "+eval.rootMeanSquaredError());
+				System.out.println("RAE = "+eval.relativeAbsoluteError());
+				System.out.println("RRSE = "+eval.rootRelativeSquaredError());
+				System.out.println("Precision = "+eval.precision(1));
+				System.out.println("Recall = "+eval.recall(1));
+				System.out.println("fMeasure = "+eval.fMeasure(1));
+				System.out.println("Error Rate = "+eval.errorRate());
+			}
+		}
+		
+		catch(Exception e)
+		{
+			
+			System.out.println(e.getMessage());
+		}
+		
+	}
+	
+	public static void trainModelClassifyInstance()
+	{
+		CSVLoader loader1 = new CSVLoader();
+		CSVLoader loader = new CSVLoader();
+		
+		try
+		{
+		 loader.setSource(new File("/home/hltuser/train.csv"));
+		 loader1.setSource(new File("/home/hltuser/testAll.csv"));
+		 String[] option1s = new String[1]; 
+			
+			option1s[0] = "-H";
+			//loader.setOptions(option1s);
+			//loader1.setOptions(option1s);
+			loader.setNoHeaderRowPresent(true);
+			loader1.setNoHeaderRowPresent(true);
+			Instances instancesTrain = loader.getDataSet();
+			instancesTrain.setClassIndex(0);
+			
+			Instances instancesTest = loader1.getDataSet();
+			instancesTest.setClassIndex(0);
+			
+		
+			//J48 j48 = new J48();
+			
+			NaiveBayes nb = new NaiveBayes();
+			
+			nb.buildClassifier(instancesTrain);
+			System.out.println("Actual Class, nb Predicted");
+			for (int i = 0; i < instancesTest.numInstances(); i++) {
+				//get class double value for current instance
+				double actualValue = instancesTest.instance(i).classValue();
+
+				//get Instance object of current instance
+				Instance newInst = instancesTest.instance(i);
+				//call classifyInstance, which returns a double value for the class
+				double predSMO = nb.classifyInstance(newInst);
+				
+				//System.out.println(actualValue+", "+predSMO);
+				System.out.println(instancesTest.instance(i).toString() +predSMO + " -> " + instancesTest.instance(i).classAttribute().value((int) predSMO));
+	}
+			
+			
+			
+			
+		}
+		
+		catch(Exception e)
+		{
+			
+			System.out.println(e.getMessage());
+		}
+		
+	}
+	
 	public static void main(String[] args) 
 	{
 		// TODO Auto-generated method stub
@@ -417,9 +543,10 @@ public class FraudDataAnalyser
 		
 		//generateData("/home/hltuser/insuranceRecords.csv");
 		
-		trainCrossValidateModel();
-		
+		//trainNaiveBayesCrossValidateModel();
+		//trainJ48ValidateModel();
 		//generateFraudInstances("/home/hltuser/insuranceRecords.csv","/home/hltuser/insuranceRecordsFraud.csv");
+		trainModelClassifyInstance();
 		
 		
 	}
