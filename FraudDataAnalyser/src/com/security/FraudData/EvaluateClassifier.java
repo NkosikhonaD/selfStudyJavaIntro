@@ -116,7 +116,7 @@ public class EvaluateClassifier
 	{
 		
 		//foldsEvaluation("nb",10);
-		classifyInstance(testInstances,TrainClassifiers.trainClassifer(trainInstances, "nb"));
+		//classifyInstance(testInstances,TrainClassifiers.trainClassifer(trainInstances, "nb"));
 		
 		
 		
