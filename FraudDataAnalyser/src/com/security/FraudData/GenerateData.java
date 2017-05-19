@@ -11,27 +11,11 @@ import java.io.InputStreamReader;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import weka.associations.*;
-import weka.classifiers.Classifier;
-import weka.classifiers.functions.SMO;
-import weka.classifiers.functions.supportVector.RBFKernel;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.evaluation.EvaluationUtils;
-import weka.classifiers.evaluation.Prediction;
-import weka.classifiers.trees.J48;
-import weka.classifiers.trees.j48.*;
 
-import java.util.Random;
-
-import weka.core.converters.CSVLoader;
-import weka.core.converters.ConverterUtils.DataSource;
-public class FraudDataAnalyser
+public class GenerateData
 {
-	
-    ////private static final String ChronoUnits = null;
+
+////private static final String ChronoUnits = null;
 	public static String claimIndicator ="True";
 	public static LocalDate today = LocalDate.now();
 	public static LocalDate dateLoss=LocalDate.now();
@@ -71,8 +55,8 @@ public class FraudDataAnalyser
 	public static String[] loss = {"Fire","Theft","Storm","Highjack","Accident"};
 	
 
-	/*Generate IDs,
-	 * 
+	/*
+	 * Generate IDs,
 	 */
 	public static String getIDs()
 	{
@@ -90,15 +74,15 @@ public class FraudDataAnalyser
 			
 			try (BufferedWriter bw = new BufferedWriter(new FileWriter(FileName,true)))
 			{
-				System.out.println("Writting to file .....\n ");
+				System.out.println("Generating Data .... \n ");
 				for( int i =0; i<100000;i++)
 				{
 				
 					content= getAll(maritalStatus,gender,peopleNames,places,cities,towns,loss,streets,companyNames,provinces,i,0)+"\n";
 					bw.write(content);
 				}
-			
-				System.out.println("Done");
+				
+				System.out.println("Done... Total records generated =100000"+"\nData saved in file location "+FileName );
 			} 
 			catch (IOException e) 
 			{
@@ -161,27 +145,27 @@ public class FraudDataAnalyser
 		}
 		
 		String record= ","+ dateLoss.toString() +","+ dateClaim.toString()+","+getIDs(); 
-		//create Fraud entries
+		// Create records with entries
 		if(position%1000==0)
 		{
 			count++;
 			//change sumRevenue to ==0,
 			if(count<20)
 			{
-				sumRevenue =0;
+				;
 			record = "False"+","+"No revenue recieved"+ record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
 					","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
 						+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
-						+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+						+"R"+sumInsured+","+"R"+0+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
 			return record;
 			}
 			else if (count>=20 &&count <40)
 			{
-				amountPaid = sumInsured+amountPaid;
+				 
 				record = "False"+","+"amount paid is greater than amount insured"+ record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
 						","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
 							+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
-							+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+							+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+(sumInsured+amountPaid)+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
 				return record;
 			}
 			else if (count >=40 && count<60)
@@ -198,7 +182,7 @@ public class FraudDataAnalyser
 				//default to 
 			else
 			{
-					record = "False"+","+"all entries are valid"+record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+					record = "False"+","+"no revenue recieved"+record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
 							","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
 								+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
 								+"R"+sumInsured+","+"R"+0+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
@@ -230,7 +214,7 @@ public class FraudDataAnalyser
 	{
 		boolean done =false;
 		LocalDate temp = startDate;
-		int changeItem = randBetween(1,4); //help us randomly choose which date field to change
+		int changeItem = randBetween(1,4); //help to randomly choose which date field to change
 		try
 		{
 			
@@ -270,7 +254,6 @@ public class FraudDataAnalyser
 	 * @param dateStart beginning of policy, 
 	 * @param dateEnd date policy was terminated.
 	 */
-	
 	public static LocalDate getValidClaimDate(LocalDate dateStart, LocalDate dateEnd)
 	{
 		boolean done = false;
@@ -312,7 +295,6 @@ public class FraudDataAnalyser
 				getValidClaimDate(dateStart,dateEnd);
 			}
 		}
-		
 		return (temp.isBefore(dateEnd))? temp :dateEnd ;
 	}
 	public static void generateFraudInstances(String filename,String outputFile)
@@ -331,32 +313,25 @@ public class FraudDataAnalyser
 			in = new DataInputStream(fstream);
 			br = new BufferedReader(new InputStreamReader(in));
 			bw= new BufferedWriter(new FileWriter(outputFile,true));
-			System.out.println("Writting to file");
+			System.out.println("Generating data ....");
 			while((line =br.readLine())!=null)
 			{
 				
 				if(trace%1000==0)
 				{
 					content = line.replaceFirst("True","False\n");
-					//System.out.println(content);
-					
 					bw.write(content);
-					//break;
 				}
 				else
 				{
 					
 					content = line;
-					//System.out.println(content);
 					bw.write(content+"\n");
 				}
 				
 				trace++;
-			
 			}
 			System.out.println("Done writting to file");
-
-
 			in.close();
 			bw.close();
 		}
@@ -382,12 +357,11 @@ public class FraudDataAnalyser
 	{
 		// TODO Auto-generated method stub
 	
-		//generateData("/home/hltuser/insuranceRecords.csv");
-		
-		//trainNaiveBayesCrossValidateModel();
-		//trainJ48ValidateModel();
+		generateData("/home/hltuser/insuranceRecordsNow.csv");
 		//generateFraudInstances("/home/hltuser/insuranceRecords.csv","/home/hltuser/insuranceRecordsFraud.csv");
 
 	}
+	
 
+	
 }

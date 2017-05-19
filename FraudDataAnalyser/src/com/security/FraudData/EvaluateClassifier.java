@@ -59,7 +59,7 @@ public class EvaluateClassifier
 						
 						eval.evaluateModel(thisClassfier, test);
 						System.out.println();
-						System.out.println(eval.toMatrixString("=== Confusion matrix for fold " + (1+1) + "/" + 10 + " ===\n"));
+						System.out.println(eval.toMatrixString("=== Confusion matrix for fold " + (1+i) + "/" + 10 + " ===\n"));
 						System.out.println("Correct % = "+eval.pctCorrect());
 						System.out.println("Incorrect % = "+eval.pctIncorrect());
 						System.out.println("AUC = "+eval.areaUnderROC(1));
@@ -114,10 +114,6 @@ public class EvaluateClassifier
 	}
 	public static void main(String[] args)
 	{
-		
-		//foldsEvaluation("nb",10);
-		//classifyInstance(testInstances,TrainClassifiers.trainClassifer(trainInstances, "nb"));
-		
 		
 		
 	}

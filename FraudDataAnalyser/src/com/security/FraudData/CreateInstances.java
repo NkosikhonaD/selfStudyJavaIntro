@@ -1,9 +1,8 @@
 package com.security.FraudData;
 
 import java.io.File;
-import java.util.Random;
 
-
+import weka.core.Attribute;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 import weka.core.converters.CSVSaver;
@@ -14,16 +13,16 @@ public class CreateInstances
 {
 	public static CSVLoader loader = new CSVLoader();
 	
-	public static  Instances getInstances(String path)
+	public static  Instances getInstances(String pathtocsv)
 	{
-		Instances thisInstance = null;
+		Instances thisInstances = null;
 		try
 		{
-			loader.setSource(new File(path));
+			loader.setSource(new File(pathtocsv));
 			loader.setNoHeaderRowPresent(true);
-			thisInstance = loader.getDataSet();
-			thisInstance.setClassIndex(0);
-			
+			//System.out.println(loader.getStructure());
+			thisInstances = loader.getDataSet();
+			thisInstances.setClassIndex(0);
 		}
 	
 		catch(Exception e)
@@ -31,42 +30,69 @@ public class CreateInstances
 		
 			System.out.println(e.getMessage());
 		}
-		return thisInstance;
+		return thisInstances;
 		
 	}
+	public static  Instances getInstancesWithoutClass(String pathtocsv)
+	{
+		Instances thisInstances = null;
+		try
+		{
+			loader.setSource(new File(pathtocsv));
+			loader.setNoHeaderRowPresent(true);
+			//System.out.println(loader.getStructure());
+			thisInstances = loader.getDataSet();
+		}
+	
+		catch(Exception e)
+		{
+		
+			System.out.println(e.getMessage());
+		}
+		return thisInstances;
+		
+	}
+	
+	
+	
+	/*Remove identifiers and  sensitive information like marriage status.
+	 * 
+	 */
 	public static Instances annonymize(Instances originalInstances)
 	{
 		String[] options = new String[2];
 		options[0]="-R";
-		options[1]="7";
-		
-		String[] options2 = new String[2];
-		options2[0]="-R";
-		options2[1]="25";
-		//options[2]="26";
+		options[1]="7,19,26";
 		Instances annoymisedInstances= null;
 		Remove remove = new Remove();
-		Remove remove2 = new Remove();
-		
-	
+
 		try
 		{
-			
 			remove.setOptions(options);
 			remove.setInputFormat(originalInstances);
 			annoymisedInstances = Filter.useFilter(originalInstances,remove);
 			
-			remove2.setOptions(options2);
-			remove2.setInputFormat(annoymisedInstances);
-			annoymisedInstances = Filter.useFilter(annoymisedInstances,remove2);
+			
 		}
 		catch(Exception ext)
 		{
 			System.out.println("Thrown in annoymize "+ext.getMessage());
 		}
-		
 		return annoymisedInstances;
 	}
+	public static Instances generalize(Instances originalInstances)
+	{
+		Attribute att = originalInstances.attribute(7);
+		for(int n=0 ;n <att.numValues();n++)
+		{
+			originalInstances.renameAttributeValue(att,att.value(n),"people");
+		}
+		
+		return annonymize(originalInstances);
+	}
+	
+	
+	
 	public static void saveInCsv(Instances instances)
 	{
 		
@@ -75,12 +101,14 @@ public class CreateInstances
 		{
 		saver.setNoHeaderRow(true);
 		saver.setInstances(instances);
-		saver.setFile(new File("/homehltuser/annonymisedRecords.csv"));
+		System.out.println("Saving annonymised Records in file location /home/hltuser/annonymisedRecords.csv");
+		saver.setFile(new File("/home/hltuser/annonymisedRecords.csv"));
+		
 		saver.writeBatch();
 		}
 		catch(Exception exp)
 		{
-			System.out.println("Thrown in saveInsCSV");
+			System.out.println("Thrown in saveInsCSV method of CreateInstance Class");
 		}
 	}
 	public static void viewInstances(Instances instances, int total )
@@ -89,6 +117,7 @@ public class CreateInstances
 		System.out.println("Number of attributes per instance "+instances.get(1).numAttributes());
 		if (total >instances.numInstances())
 		{
+			
 			total = instances.numInstances();
 		}
 		for(int i=0;i<total;i++)
@@ -96,5 +125,10 @@ public class CreateInstances
 			System.out.println(instances.instance(i));
 		}
 		
+	}
+	
+	public static void main(String[] args)
+	{
+		Instances or =getInstances(""); 
 	}
 }

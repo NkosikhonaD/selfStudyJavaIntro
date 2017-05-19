@@ -19,10 +19,17 @@ public class AssociationRules
 		try
 		{
 		  Discretize  filter =  new Discretize();
-		  
+		  String[] options = new String[2];
+		  options[0] ="-R";
+		  options[1] ="first-last";
 		  apriori = new Apriori();
+		  filter.setOptions(options);
+		  filter.setBins(2);
+		  filter.setInputFormat(data);
+		  discritizedInstances= Filter.useFilter(data,filter );
+		
 		  apriori.setClassIndex(data.classIndex());
-		  apriori.buildAssociations(data);
+		  apriori.buildAssociations(discritizedInstances);
 		  // output associator
 		  System.out.println(apriori);
 		}
