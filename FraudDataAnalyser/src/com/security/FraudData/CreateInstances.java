@@ -126,9 +126,4 @@ public class CreateInstances
 		}
 		
 	}
-	
-	public static void main(String[] args)
-	{
-		Instances or =getInstances(""); 
-	}
 }

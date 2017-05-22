@@ -1,4 +1,5 @@
 package com.security.FraudData;
+import weka.classifiers.Classifier;
 import weka.core.Instances;
 import java.awt.*;
 import java.awt.event.*;
@@ -8,7 +9,12 @@ import javax.swing.*;
 public class DriverClass extends JPanel
 {
 	public static  TextArea displayText;
+	public static Classifier newClassifier;
+	public boolean trained = false;
 	boolean datagenerated = false;
+	boolean cleaned = false;
+	boolean annony = false;
+	
 	public static  TextField programStatus;
 	public static JFrame frame;
 	Instances originalInstances;
@@ -50,11 +56,11 @@ public class DriverClass extends JPanel
 		 GridBagConstraints c = new GridBagConstraints();
 		 frame.setLayout(gridBag);
 		 c.fill = c.BOTH;
-		 c.anchor = c.BASELINE_LEADING;
-		 c.insets.top = 40;
-		 c.insets.bottom = 40;
-		 c.insets.left = 40;
-		 c.insets.right = 40;
+		 c.anchor = c.CENTER;
+		 c.insets.top = 35;
+		 c.insets.bottom = 35;
+		 c.insets.left = 100;
+		 c.insets.right = 100;
 		 
 		 c.gridx = 0;
 		 c.gridy = 0;
@@ -62,13 +68,13 @@ public class DriverClass extends JPanel
 		 c.gridwidth = 2;
 		 c.ipadx = 35;
 		 makebutton("Generate", gridBag, c);
-		 
 		 c.gridx = 3;
 		 c.gridy = 0;
-		 c.gridheight = 10;
-		 c.gridwidth = 20;
-		 c.ipadx = 0;
-		 makeTextArea("            ", gridBag, c);
+		 c.gridheight = 34;
+		 c.gridwidth = 150;
+		 c.ipadx = 200;
+		 //c.ipady =34;
+		 makeTextArea("    Simulation Output Display  ", gridBag, c);
 		 
 		 
 		 c.gridx = 0;
@@ -76,31 +82,38 @@ public class DriverClass extends JPanel
 		 c.gridheight = 1;
 		 c.gridwidth = 1;
 		 c.ipadx = 0;
-		 makebutton("Annonymize", gridBag, c);
+		 makebutton("Verify data", gridBag, c);
 		 
 		 c.gridx = 0;
 		 c.gridy = 2;
 		 c.gridheight = 1;
 		 c.gridwidth = 2;
 		 c.ipadx = 0;
-		 makebutton("View data", gridBag, c);
+		 makebutton("Clean data", gridBag, c);
 		 
 		 c.gridx = 0;
 		 c.gridy = 3;
 		 c.gridheight = 1;
-		 c.gridwidth = 1;
+		 c.gridwidth = 2;
 		 c.ipadx = 0;
-		 makeTextField("View activities", gridBag, c);
+		 makebutton("Annonymise", gridBag, c);
 		 
 		 c.gridx = 0;
 		 c.gridy = 4;
+		 c.gridheight = 1;
+		 c.gridwidth = 1;
+		 c.ipadx = 0;
+		 makebutton("Cluster data", gridBag, c);
+		 
+		 c.gridx = 0;
+		 c.gridy = 5;
 		 c.gridheight = 1;
 		 c.gridwidth = 2;
 		 c.ipadx = 0;
 		 makebutton("TrainClassifier", gridBag, c);
 		 
 		 c.gridx = 0;
-		 c.gridy = 5;
+		 c.gridy = 6;
 		 c.gridheight = 1;
 		 c.gridwidth = 2;
 		 c.ipadx = 0;
@@ -122,22 +135,30 @@ public class DriverClass extends JPanel
 		if(label.equalsIgnoreCase("Generate"))
 			{
 			datagenerated= true;
-			GenerateData.generateData("/home/hltuser/rawData.csv");
+			GenerateData.generateData("/home/hltuser/runSimulation/rawData.csv");
 			//displayText;
-			displayText.setText("Done Generating Data.\nLocation /home/hltuser/rawData.csv\n");
+			displayText.setText("Done Generating Data.\nLocation: /home/hltuser/runSimulation/rawData.csv\n");
 			
 			}
-		if(label.equalsIgnoreCase("Annonymize"))
+		if(label.equalsIgnoreCase("Annonymise"))
 			{	
 				if(datagenerated)
-				{
-					displayText.setText("Processing data ...please wait\nThis step involves\n removing peoples indentitiesWhich are\nNames\nAnd\nQuasi Indentifiers are generalized sensitive information");
-					originalInstances =CreateInstances.getInstances("/home/hltuser/rawData.csv");
-					annonymizedInstances =CreateInstances.generalize(originalInstances);
-				
-		
-					CreateInstances.saveInCsv(annonymizedInstances);
-					displayText.setText("Generalized data saved in location /home/hltuser/annonymisedRecords.csv\n select view data");
+				{	
+					if(cleaned)
+					{
+						displayText.setText("Processing data ...please wait\nThis step involves\n1. Removing peoples indentities:Names\nAnd\nQuasi Indentifiers are generalized");
+						originalInstances =CreateInstances.getInstances("/home/hltuser/runSimulation/cleanrawData.csv");
+						annonymizedInstances =CreateInstances.generalize(originalInstances);
+						CreateInstances.saveInCsv(annonymizedInstances);
+						displayText.setText("Generalized data saved in location /home/hltuser/runSimulation/annonymisedRecords.csv\n select view data");
+						annony = true;
+					}
+					else
+					{
+						displayText.setText("Please clean data first to ensure records are valid data: remove incomplete records");
+						
+					}
+					
 					
 				}
 				else
@@ -152,16 +173,50 @@ public class DriverClass extends JPanel
 		{
 			if(datagenerated)
 			{
-				displayText.setText("This displays a sample 5 data before Generalization\n and after Generalization was applied\n");
+				if(cleaned && annony)
+				{
+					displayText.setText("This displays a sample 5 data Before Generalization\n and after Generalization was applied\n");
 				///CreateInstances.viewInstances(originalInstances,5);
-				for(int i=0;i<5;i++)
-				{
-					displayText.append(originalInstances.instance(i).toString()+"\n");
+					for(int i=0;i<5;i++)
+					{
+						displayText.append(originalInstances.instance(i).toString()+"\n");
+					}
+					displayText.append("\n=============After generalization=============\n \n");
+					for (int i=0;i<5;i++)
+					{
+						displayText.append(annonymizedInstances.instance(i).toString()+"\n");
+					}
 				}
-				displayText.append("=============After generalization============= \n \n");
-				for (int i=0;i<5;i++)
+				else
 				{
-					displayText.append(annonymizedInstances.instance(i).toString()+"\n");
+					displayText.append("Please clean and annonyimise data first, before continueing to view data ");
+					
+				}
+			}
+			else
+			{
+				displayText.setText("Data was not generated please proceed to click generated button");
+			}
+		}
+		
+		if(label.equalsIgnoreCase("Verify Data"))
+		{
+			if(datagenerated)
+			{
+				if(cleaned)
+				{
+					displayText.setText("Calling verfiy method... \n");
+					CleanData.verifyCleanInstances("/home/hltuser/runSimulation/cleanrawData.csv");
+					displayText.append(CleanData.update);
+					  //("/home/hltuser/runSimulation/cleanrawData.csv);
+					
+				}
+				else
+				{
+					displayText.setText("Calling verfiy method... \n");
+					
+					CleanData.verifyCleanInstances("/home/hltuser/runSimulation/rawData.csv");
+					displayText.append(CleanData.update);
 				}
 				
 			}
@@ -169,7 +224,82 @@ public class DriverClass extends JPanel
 			{
 				displayText.setText("Data was not generated please proceed to click generated button");
 			}
+			
 		}
+		
+		if(label.equalsIgnoreCase("Evaluate"))
+		{
+			if(trained)
+			{
+				
+					displayText.setText("Cross Evaluating classifier started..\nPlease wait ...");
+					//Instances train = CreateInstances.getInstances("/home/hltuser/runSimulation/annonymisedRecords.csv");
+					EvaluateClassifier.foldsEvaluation(annonymizedInstances,"nb",10);
+					String st = EvaluateClassifier.allStats;
+					displayText.append("\nDone cross evaluating\nDislaying Statistics\n");
+					displayText.append(st);
+					
+			}
+			else
+			{
+				displayText.setText("Classifier not trained, please ensure you have trained before evaluating classifier");
+			}
+			
+		}
+		
+		if(label.equalsIgnoreCase("TrainClassifier"))
+		{
+			if(datagenerated)
+			{
+				if(cleaned && annony)
+				{
+					displayText.setText("Training Naive Bayes classifier started..\nPlease wait ...\n");
+					//Instances train = CreateInstances.getInstances("/home/hltuser/runSimulation/annonymisedRecords.csv");
+					newClassifier=TrainClassifiers.trainClassifer(annonymizedInstances,"nb");
+					displayText.append("Done training classifier ... you can evaluate the classifier");
+					trained =true;
+					//(annonymizedInstances)
+				}
+				else
+				{
+					displayText.setText("Data was not cleaned and annoyimsed cannot continue trainnig classifier, please clean and annonymize data \n");
+					
+				}
+				
+			}
+			else
+			{
+				displayText.setText("Data was not generated please proceed to click generated button");
+			}
+			
+		}
+		
+		if(label.equalsIgnoreCase("Clean Data"))
+		{
+			if(datagenerated)
+			{
+				if(cleaned)
+				{
+					displayText.setText("data was cleaned proceed to annonyimize data");
+				}
+				else
+				{
+					displayText.setText("Pleas wait .. data is cleaned \n");
+					
+					CleanData.cleanInstances("/home/hltuser/runSimulation/rawData.csv","/home/hltuser/runSimulation/cleanrawData.csv");
+					displayText.append(CleanData.update+" in /home/hltuser/runSimulation/cleanrawData.csv\nPlease view data to see how clean and unclean samples compare\n");
+					cleaned = true;
+				}
+				
+			}
+			else
+			{
+				displayText.setText("Data was not generated please proceed to click generated button");
+			}
+			
+		}
+		
+		
 		}
         });
         gridbag.setConstraints(button, c);

@@ -16,6 +16,8 @@ public class GenerateData
 {
 
 ////private static final String ChronoUnits = null;
+	public static int count =0;
+	public static int count2=0;
 	public static String claimIndicator ="True";
 	public static LocalDate today = LocalDate.now();
 	public static LocalDate dateLoss=LocalDate.now();
@@ -77,8 +79,18 @@ public class GenerateData
 				System.out.println("Generating Data .... \n ");
 				for( int i =0; i<100000;i++)
 				{
-				
-					content= getAll(maritalStatus,gender,peopleNames,places,cities,towns,loss,streets,companyNames,provinces,i,0)+"\n";
+					if(i%1000==0)
+					{
+						count++;
+					}
+					else
+					{
+						if(i%1001==0)
+						{
+							count2++;
+						}
+					}
+					content= getAll(maritalStatus,gender,peopleNames,places,cities,towns,loss,streets,companyNames,provinces,i,count,count2)+"\n";
 					bw.write(content);
 				}
 				
@@ -97,7 +109,7 @@ public class GenerateData
 		int i =  randBetween(0,s.length-1);
 		return s[i]; 
 	}
-	public static String getAll(String[] marital, String[] gender, String peopleNames[],String places[],String[] cities,String[] towns,String[] loss ,String[] streets,String[] companyNames,String[] provinces,int position,int count)
+	public static String getAll(String[] marital, String[] gender, String peopleNames[],String places[],String[] cities,String[] towns,String[] loss ,String[] streets,String[] companyNames,String[] provinces,int position,int count,int count2)
 	{
 		
 		sumRevenue =randBetween(1000,200000);
@@ -148,7 +160,7 @@ public class GenerateData
 		// Create records with entries
 		if(position%1000==0)
 		{
-			count++;
+			
 			//change sumRevenue to ==0,
 			if(count<20)
 			{
@@ -192,14 +204,43 @@ public class GenerateData
 			}	
 			
 		}
-		else
+		else if (position %1001==0)
 		{
-			record = "True"+","+"all entries are valid"+record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+			if(count2< 20)
+			{	
+			record = "True"+","+"all entries are valid"+","+" "+","+" "+","+" "+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
 			","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
 				+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
 				+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
 			return record;
+			}
+			else if(count2 >=20&& count2 < 40 )
+			{
+				record = "True"+","+"all entries are valid"+","+" "+","+" "+","+" "+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+						","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+							+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+							+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateBirth.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+				return record;
+			}
+			else
+			{
+				record = "True"+","+"all entries are valid"+","+" "+","+"1"+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+						","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+							+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+							+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateBirth.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+				return record;
+				
+			}
+			
 		} 
+		else
+		{
+			record = "True"+","+"all entries are valid"+record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+					","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
+						+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
+						+"R"+sumInsured+","+"R"+sumRevenue+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];
+					return record;
+		}
 	}
 	public static String getPostalCode()
 	{
@@ -286,7 +327,7 @@ public class GenerateData
 		}
 		catch(DateTimeException dte)
 		{
-		
+			
 		}
 		finally 
 		{
@@ -357,7 +398,9 @@ public class GenerateData
 	{
 		// TODO Auto-generated method stub
 	
-		generateData("/home/hltuser/insuranceRecordsNow.csv");
+		//generateData("/home/hltuser/newData1.csv");
+		
+		
 		//generateFraudInstances("/home/hltuser/insuranceRecords.csv","/home/hltuser/insuranceRecordsFraud.csv");
 
 	}
