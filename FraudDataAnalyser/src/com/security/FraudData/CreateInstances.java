@@ -57,6 +57,9 @@ public class CreateInstances
 	
 	/*Remove identifiers and  sensitive information like marriage status.
 	 * 
+	 * remove attributes found in positon  7- policy hoders name
+	 *                                     19 Marital status of the policy holder.
+	 *                                     26 Name of third-party 
 	 */
 	public static Instances annonymize(Instances originalInstances)
 	{
@@ -71,8 +74,6 @@ public class CreateInstances
 			remove.setOptions(options);
 			remove.setInputFormat(originalInstances);
 			annoymisedInstances = Filter.useFilter(originalInstances,remove);
-			
-			
 		}
 		catch(Exception ext)
 		{
@@ -82,13 +83,14 @@ public class CreateInstances
 	}
 	public static Instances generalize(Instances originalInstances)
 	{
-		Attribute att = originalInstances.attribute(7);
+		Instances tempInstances = originalInstances;
+		Attribute att = tempInstances.attribute(7);
 		for(int n=0 ;n <att.numValues();n++)
 		{
-			originalInstances.renameAttributeValue(att,att.value(n),"people");
+			tempInstances.renameAttributeValue(att,att.value(n),"people");
 		}
 		
-		return annonymize(originalInstances);
+		return annonymize(tempInstances);
 	}
 	
 	
@@ -101,8 +103,8 @@ public class CreateInstances
 		{
 		saver.setNoHeaderRow(true);
 		saver.setInstances(instances);
-		System.out.println("Saving annonymised Records in file location /home/hltuser/annonymisedRecords.csv");
-		saver.setFile(new File("/home/hltuser/annonymisedRecords.csv"));
+		System.out.println("Saving annonymised Records in file location /home/hltuser/runSimulation/annonymisedRecords.csv");
+		saver.setFile(new File("/home/hltuser/runSimulation/annonymisedRecords.csv"));
 		
 		saver.writeBatch();
 		}

@@ -98,31 +98,39 @@ public class DriverClass extends JPanel
 		 c.ipadx = 0;
 		 makebutton("Annonymise", gridBag, c);
 		 
+		 
+		 
 		 c.gridx = 0;
 		 c.gridy = 4;
 		 c.gridheight = 1;
 		 c.gridwidth = 1;
 		 c.ipadx = 0;
-		 makebutton("Cluster data", gridBag, c);
+		 makebutton("View Data", gridBag, c);
 		 
 		 c.gridx = 0;
 		 c.gridy = 5;
 		 c.gridheight = 1;
-		 c.gridwidth = 2;
+		 c.gridwidth = 1;
 		 c.ipadx = 0;
-		 makebutton("TrainClassifier", gridBag, c);
+		 makebutton("Cluster data", gridBag, c);
+		 
+		 
 		 
 		 c.gridx = 0;
 		 c.gridy = 6;
 		 c.gridheight = 1;
 		 c.gridwidth = 2;
 		 c.ipadx = 0;
+		 makebutton("TrainClassifier", gridBag, c);
+		 
+		 c.gridx = 0;
+		 c.gridy = 7;
+		 c.gridheight = 1;
+		 c.gridwidth = 2;
+		 c.ipadx = 0;
 		 makebutton("Evaluate", gridBag, c);
-		 //frame.setPreferredSize(new Dimension(600, 700));
-		// frame.setSize(900,1000);
-		 //frame.setSize(1000, 1200);
 		 frame.pack();
-		 //frame.setResizable(true);
+
 		 frame.setVisible(true);
 		 
 		 
@@ -138,6 +146,8 @@ public class DriverClass extends JPanel
 			GenerateData.generateData("/home/hltuser/runSimulation/rawData.csv");
 			//displayText;
 			displayText.setText("Done Generating Data.\nLocation: /home/hltuser/runSimulation/rawData.csv\n");
+			CleanData.displayStats("/home/hltuser/runSimulation/rawData.csv");
+			displayText.append("\n Analysis of Data  Generated\n"+CleanData.update);
 			
 			}
 		if(label.equalsIgnoreCase("Annonymise"))
@@ -146,11 +156,13 @@ public class DriverClass extends JPanel
 				{	
 					if(cleaned)
 					{
+						Instances oin = originalInstances;
 						displayText.setText("Processing data ...please wait\nThis step involves\n1. Removing peoples indentities:Names\nAnd\nQuasi Indentifiers are generalized");
-						originalInstances =CreateInstances.getInstances("/home/hltuser/runSimulation/cleanrawData.csv");
-						annonymizedInstances =CreateInstances.generalize(originalInstances);
+						annonymizedInstances =CreateInstances.generalize(oin);
 						CreateInstances.saveInCsv(annonymizedInstances);
 						displayText.setText("Generalized data saved in location /home/hltuser/runSimulation/annonymisedRecords.csv\n select view data");
+						CleanData.displayStats("/home/hltuser/runSimulation/annonymisedRecords.csv");
+						displayText.append("\nData analysis after Annonyimizatio\n"+CleanData.update);
 						annony = true;
 					}
 					else
@@ -180,16 +192,26 @@ public class DriverClass extends JPanel
 					for(int i=0;i<5;i++)
 					{
 						displayText.append(originalInstances.instance(i).toString()+"\n");
+						displayText.append("Total Attributes before "+originalInstances.numAttributes());
+						displayText.append(CleanData.update);
 					}
 					displayText.append("\n=============After generalization=============\n \n");
 					for (int i=0;i<5;i++)
 					{
 						displayText.append(annonymizedInstances.instance(i).toString()+"\n");
+						displayText.append("Total Attributes After Annonyimization "+annonymizedInstances.numAttributes());
+						
 					}
 				}
 				else
 				{
-					displayText.append("Please clean and annonyimise data first, before continueing to view data ");
+					displayText.setText("This displays 5 samples of records before generalization\n");
+					for(int i=0;i<5;i++)
+					{
+						displayText.append(originalInstances.instance(i).toString()+"\n");
+					}
+					
+					displayText.append("Please annonyimise data and view to see the differnces");
 					
 				}
 			}
@@ -208,6 +230,8 @@ public class DriverClass extends JPanel
 					displayText.setText("Calling verfiy method... \n");
 					CleanData.verifyCleanInstances("/home/hltuser/runSimulation/cleanrawData.csv");
 					displayText.append(CleanData.update);
+					CleanData.displayStats("/home/hltuser/runSimulation/cleanrawData.csv");
+					displayText.append("\nData analysis after Sanitazing\n"+CleanData.update);
 					  //("/home/hltuser/runSimulation/cleanrawData.csv);
 					
 				}
@@ -217,6 +241,11 @@ public class DriverClass extends JPanel
 					
 					CleanData.verifyCleanInstances("/home/hltuser/runSimulation/rawData.csv");
 					displayText.append(CleanData.update);
+					CleanData.displayStats("/home/hltuser/runSimulation/rawData.csv");
+					displayText.append("\nData analysis\n"+CleanData.update);
+					
+					
+					
 				}
 				
 			}
@@ -288,6 +317,10 @@ public class DriverClass extends JPanel
 					
 					CleanData.cleanInstances("/home/hltuser/runSimulation/rawData.csv","/home/hltuser/runSimulation/cleanrawData.csv");
 					displayText.append(CleanData.update+" in /home/hltuser/runSimulation/cleanrawData.csv\nPlease view data to see how clean and unclean samples compare\n");
+					originalInstances =CreateInstances.getInstances("/home/hltuser/runSimulation/cleanrawData.csv");
+					//CleanData.displayStats("/home/hltuser/runSimulation/cleanrawData.csv");
+					//displayText.append("Data Analysis after" CleanData.update);
+					
 					cleaned = true;
 				}
 				
@@ -337,21 +370,4 @@ public class DriverClass extends JPanel
 		return newButton;
 		
 	}
-	 /*public void actionPerformed(ActionEvent e)
-	 {
-		JButton clickedButton =(JButton)e.getSource();
-		String label = clickedButton.getText();
-		if(label.equalsIgnoreCase("Generate"))
-		{
-			
-			GenerateData.generateData("~/rawData.csv");
-			TextArea tx = DriverClass.displayText;
-			tx.setText("Done Generating Data.\nLocation /home/hltuser/rawData.csv\n");
-					
-			
-			
-		}
-		
-     }**/
-
 }

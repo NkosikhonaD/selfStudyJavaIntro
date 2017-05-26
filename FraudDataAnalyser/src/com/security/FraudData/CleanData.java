@@ -102,7 +102,80 @@ public class CleanData
 		}
 	}
 	
-	
+	public static void displayStats(String FileName)
+	{
+		  int totalFalse=0;
+		  int totalRecords =0;
+		  int totalTrue=0;
+		  int totalNoloss=0;
+		  int claimGreater=0;
+		  int noRevenue=0;
+		  int incompleteRecords=0;
+		  String all ="";
+		  String otherall ="";
+		  
+		  
+		  
+		  FileInputStream fstream ;
+		  DataInputStream in ;
+		  BufferedReader br;
+		  String line;
+		  BufferedWriter bw;
+		  String content;
+		  boolean count = true;
+		try
+		{
+			
+			fstream = new FileInputStream(FileName);
+			in = new DataInputStream(fstream);
+			br = new BufferedReader(new InputStreamReader(in));
+			update = " Exploring Data ...\n";
+			System.out.println(update);
+			while((line =br.readLine())!=null)
+			{
+				totalRecords+=1;
+				if(checkMissingAttributes(line))
+				{
+					incompleteRecords+=1;	
+				}
+				String[] arry = line.split(",");
+				if(arry[0].equalsIgnoreCase("true"))
+				{
+					totalTrue+=1;
+				}
+				if(arry[0].equalsIgnoreCase("false"))
+				{
+					totalFalse+=1;
+				}
+				if(arry[1].equalsIgnoreCase("amount paid is greater than amount insured"))
+				{
+					claimGreater+=1;
+				}
+				if(arry[1].equalsIgnoreCase("no revenue recieved"))
+				{
+					noRevenue+=1;
+				}
+				if(arry[1].equalsIgnoreCase("no loss"))
+				{
+					totalNoloss+=1;
+				}
+
+			}
+			all ="Total records "+totalRecords+"\n"+"Total False " +totalFalse+"\n"+"Total True "+totalTrue+"\n";
+			otherall= "No revenue " +noRevenue+"\n"+"No loss " +totalNoloss+"\n"+"Excess Claim "+claimGreater+"\n";
+			all= all+otherall +"\nIncomplete records "+incompleteRecords;
+			update =all;
+			System.out.println(all);
+			
+		
+		}
+		catch(Exception exp)
+		{
+			System.out.println(exp.getMessage());
+		}
+		
+		
+	}
 	public static boolean checkMissingAttributes(String line)
 	{
 		String[] arry = line.split(",");
@@ -138,6 +211,8 @@ public class CleanData
 		//cleanInstances("/home/hltuser/newData1.csv","/home/hltuser/cleanNewData1.csv");
 		//verifyCleanInstances("/home/hltuser/newData1.csv");
 		//verifyCleanInstances("/home/hltuser/cleanNewData1.csv");
+		//displayStats("/home/hltuser/runSimulation/rawData.csv");
+		
 		
 	}
 	

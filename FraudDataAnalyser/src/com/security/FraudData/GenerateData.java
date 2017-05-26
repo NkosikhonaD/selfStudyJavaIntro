@@ -165,7 +165,7 @@ public class GenerateData
 			if(count<20)
 			{
 				;
-			record = "False"+","+"No revenue recieved"+ record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
+			record = "False"+","+"no revenue recieved"+ record +","+peopleNames[indexPeople]+","+gender[indexGender]+","+loss[indexLoss]+","+streets[indexStreets]+ ","+provinces[provinceIndex]+
 					","+cities[cityIndex]+","+places[placeIndex]+","+getPostalCode()+","+provinces[provinceIndex1]+","+cities[cityIndex1]
 						+","+places[placeIndex1]+","+getPostalCode()+","+ getMaritalStatus(marital)+","+dateBirth.toString()+","
 						+"R"+sumInsured+","+"R"+0+","+"R"+amountPaid+","+dateStart.toString()+","+dateEnd.toString()+","+peopleNames[otherName]+","+companyNames[indexCompay]+" "+cities[cityIndex];

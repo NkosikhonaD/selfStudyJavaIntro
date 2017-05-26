@@ -66,7 +66,7 @@ public class EvaluateClassifier
 						Evaluation eval = new Evaluation(randData);
 						
 						Instances train = randData.trainCV(folds,i);
-						Instances test = randData.testCV(folds,1);
+						Instances test = randData.testCV(folds,i);
 						Classifier thisClassfier =TrainClassifiers.trainClassifer(train,classfierName);
 						thisClassfier.buildClassifier(train);
 						 confusionMatrix =""; 

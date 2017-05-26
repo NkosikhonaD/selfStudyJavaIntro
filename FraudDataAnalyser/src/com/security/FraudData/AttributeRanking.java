@@ -13,9 +13,9 @@ import weka.core.Utils;
 public class AttributeRanking 
 {
 	
+	public static String clusterOutCome ="";
 	
-	
-	public static void clustering(Instances train, Instances test)
+	public static void clustering(Instances train,Instances test)
 	{
 		SimpleKMeans clusterer = new SimpleKMeans();
 		ClusterEvaluation eval = new ClusterEvaluation();
@@ -24,14 +24,12 @@ public class AttributeRanking
 			
 			String[] options =new String[4];
 			options[0]= "-N";
-			options[1]= "2";
+			options[1]= "5";
 			options[2]= "-S";
 			options[3]= "10";
-			String[] opt ={"-c","1"};
 			clusterer.setOptions(options);
 			//clusterer.setDisplayStdDevs(true);
 			clusterer.buildClusterer(train);
-			System.out.println();
 			//eval.evaluateClusterer(train);
 		
 			System.out.println("# - cluster - distribution");
@@ -77,9 +75,10 @@ public class AttributeRanking
 		    eval = new ClusterEvaluation();
 		    eval.setClusterer(clusterer);
 		   // clusterer.setDisplayStdDevs(true);
-		    eval.evaluateClusterer(new Instances(test));
+		    eval.evaluateClusterer(new Instances(train));
+		    
+		    clusterOutCome =eval.clusterResultsToString();
 		    System.out.println(eval.clusterResultsToString());
-		    //eval.getLogLikelihood();
 		    
 	    }
 		 catch(Exception exp)
@@ -89,10 +88,14 @@ public class AttributeRanking
 	}
 	public static void main(String[] args)
 	{
-		Instances trainIn = CreateInstances.getInstancesWithoutClass("/home/hltuser/Security/annymisedTrain.csv");
-		Instances testIn= CreateInstances.getInstancesWithoutClass("/home/hltuser/Security/annymisedTest.csv");
+		Instances trainIn = CreateInstances.getInstancesWithoutClass("/home/hltuser/Security/train1.csv");
+		Instances testIn= CreateInstances.getInstancesWithoutClass("/home/hltuser/Security/test1.csv");
 		
-		clusteringCross(trainIn,testIn);
+		
+		//clusteringCross(trainIn,testIn);
+		Instances currInt = Scalling.scaleInstances(trainIn);
+		CreateInstances.viewInstances(currInt, 5);
+		//clustering(trainIn,testIn);
 	}
 	
 }
