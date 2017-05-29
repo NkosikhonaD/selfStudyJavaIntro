@@ -193,7 +193,8 @@ public class DriverClass extends JPanel
 					{
 						displayText.append(originalInstances.instance(i).toString()+"\n");
 						displayText.append("Total Attributes before "+originalInstances.numAttributes());
-						displayText.append(CleanData.update);
+						
+						//displayText.append(CleanData.update);
 					}
 					displayText.append("\n=============After generalization=============\n \n");
 					for (int i=0;i<5;i++)
@@ -346,6 +347,7 @@ public class DriverClass extends JPanel
     }
 	protected void makeTextArea(String name, GridBagLayout gridbag, GridBagConstraints c) {
 		displayText = new TextArea(name);
+		displayText.setEditable(true);
         gridbag.setConstraints(displayText, c);
         frame.add(displayText);
     }
