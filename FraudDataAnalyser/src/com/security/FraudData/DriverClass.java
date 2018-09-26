@@ -31,7 +31,7 @@ public class DriverClass extends JPanel
 	{
 		
 		frame = new JFrame();
-		displayText = new TextArea("Displaying Details");
+		displayText = new TextArea("Displaying Panel");
 		programStatus = new TextField("Programm status");
 		frame.addWindowListener(new WindowAdapter(){ public void windowClosing(WindowEvent e){System.exit(0);}});
 		frame.setContentPane(new DriverClass());
